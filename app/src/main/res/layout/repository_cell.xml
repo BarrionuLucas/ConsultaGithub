@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@android:color/white"
+    android:orientation="horizontal"
+    android:weightSum="3">
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_weight="2"
+        android:weightSum="7"
+        >
+        <TextView
+            style="@style/TextAppearance.AppCompat.Title"
+            android:text="Repositorio"
+            android:textColor="@color/blue"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:id="@+id/tvRepositotio"
+            android:lines="1"
+            android:layout_weight="2"/>
+
+        <TextView
+            style="@style/Base.TextAppearance.AppCompat.Body1"
+            android:text="Descrição do repositorio"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:id="@+id/tvDescRepo"
+            android:lines="2"
+            android:layout_weight="3"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:orientation="horizontal"
+            android:layout_weight="2">
+
+            <ImageView
+                android:id="@+id/imageView5"
+                android:layout_width="25dp"
+                android:layout_height="match_parent"
+                android:background="@android:color/transparent"
+                android:backgroundTint="@android:color/transparent"
+                android:src="@mipmap/ic_fork" />
+
+            <TextView
+                style="@style/Base.TextAppearance.AppCompat.Body1"
+                android:text="00000000"
+                android:layout_width="78dp"
+                android:gravity="center_vertical"
+                android:layout_height="match_parent"
+                android:id="@+id/tvFork"
+                android:textColor="@color/yellow"
+                android:maxLength="7"/>
+
+            <ImageView
+                android:id="@+id/imageView4"
+                android:layout_width="25dp"
+                android:layout_height="match_parent"
+                android:background="@android:color/transparent"
+                android:backgroundTint="@android:color/transparent"
+                android:src="@mipmap/ic_star" />
+
+            <TextView
+                style="@style/Base.TextAppearance.AppCompat.Body1"
+                android:text="00000000"
+                android:gravity="center_vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/tvStar"
+                android:textColor="@color/yellow"
+                android:maxLength="7"/>
+
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_gravity="right"
+        android:layout_weight="1"
+        >
+
+        <ImageView
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_gravity="center"
+            app:srcCompat="@drawable/ic_person_black_24dp"
+            android:id="@+id/ivAvatar"
+            />
+        <TextView
+            style="@style/Base.TextAppearance.AppCompat.Subhead"
+            android:text="Usuario"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/tvUser"
+            android:textColor="@color/blue"
+            android:textAlignment="center"
+            />
+
+    </LinearLayout>
+
+
+</LinearLayout>
