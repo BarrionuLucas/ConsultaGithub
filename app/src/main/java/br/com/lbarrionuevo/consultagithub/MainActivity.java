@@ -1,7 +1,10 @@
 package br.com.lbarrionuevo.consultagithub;
 
 import android.app.SearchManager;
+import android.arch.persistence.room.Room;
 import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -24,6 +27,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import br.com.lbarrionuevo.consultagithub.Dao.RepositoryDao;
+import br.com.lbarrionuevo.consultagithub.Database.OfflineDatabase;
 import br.com.lbarrionuevo.consultagithub.Model.Item;
 import br.com.lbarrionuevo.consultagithub.Model.Repository;
 import br.com.lbarrionuevo.consultagithub.Model.RepositoryJSON;
@@ -48,28 +53,42 @@ public class MainActivity extends AppCompatActivity {
     int pag=1;
     boolean mLoading = false;
     int lastVisibleItem;
+    private static final String DATABASE_NAME = "OfflineDatabase";
+    private OfflineDatabase offlineDatabase;
+    RepositoryDao repositoryDao;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        offlineDatabase = Room.databaseBuilder(getApplicationContext(),
+                OfflineDatabase.class, DATABASE_NAME)
+                .allowMainThreadQueries()
+                .build();
+        repositoryDao = offlineDatabase.getRepositoryDao();
         mRecyclerView = (RecyclerView) findViewById(R.id.rv_repo);
-
         layoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setHasFixedSize(false);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
-        getData(pag);
 
-        mAdapter = new RepoAdapter(repoList, this);
+        if(isNetworkAvailable()){
+            repositoryDao.deleteAll();
+            getData(pag);
+        }else{
+            
+            //Select from Room
+        }
+
+
+        mAdapter = new RepoAdapter(repoList, this, repositoryDao);
         mRecyclerView.setAdapter(mAdapter);
     }
 
     @Override
     protected void onPostResume() {
         super.onPostResume();
-
 
         mRecyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
 
@@ -78,22 +97,16 @@ public class MainActivity extends AppCompatActivity {
                 super.onScrolled(recyclerView, dx, dy);
 
                 int totalItem = layoutManager.getItemCount();
-
                 lastVisibleItem = layoutManager.findLastVisibleItemPosition();
+
                 if (!mLoading && lastVisibleItem == totalItem - 1) {
                     mLoading = true;
                     pag++;
-
                     getData(pag);
-
                     mLoading = false;
-
-
-                    Log.i("pos: ", String.valueOf(repoList.size() -1));
                 }
             }
         });
-        //mRecyclerView.getLayoutManager().scrollToPosition(((LinearLayoutManager) mRecyclerView.getLayoutManager()).findFirstVisibleItemPosition());
     }
 
     public void getData(int pag){
@@ -106,15 +119,11 @@ public class MainActivity extends AppCompatActivity {
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .build();
 
-
         GithubService mainService = retrofit.create(GithubService.class);
-
         Map<String, String> params = new HashMap<String, String>();
-
         params.put("q", "language:Kotlin");
         params.put("sort", "stars");
         params.put("page", String.valueOf(pag));
-
         Call<RepositoryJSON> requestStatus = mainService.listRepos(params);
 
         requestStatus.enqueue(new Callback<RepositoryJSON>() {
@@ -127,15 +136,18 @@ public class MainActivity extends AppCompatActivity {
 
                     for ( Item item: repo.getItems()) {
 
-
-                        repository = new Repository(item.getName(),item.getDescription(),  item.getOwner().getLogin(),
-                                item.getForksCount(), item.getStargazersCount(), item.getOwner().getAvatarUrl() );
+                        repository = new Repository(
+                                item.getName(),
+                                item.getDescription(),
+                                item.getOwner().getLogin(),
+                                item.getForksCount(),
+                                item.getStargazersCount(),
+                                item.getOwner().getAvatarUrl() );
 
                         repoList.add(repository);
-
+                        repositoryDao.insertRepository(repository);
                         mAdapter.notifyItemRangeInserted(mAdapter.getItemCount(), repoList.size() - 1);
                     }
-
                 }
             }
             @Override
@@ -143,8 +155,6 @@ public class MainActivity extends AppCompatActivity {
                 Log.e( "Erro:", " " + t.getMessage());
                 Toast.makeText(MainActivity.this,"Falha na conexão", Toast.LENGTH_LONG).show();
             }
-
-
         });
     }
 
@@ -158,8 +168,7 @@ public class MainActivity extends AppCompatActivity {
         MenuItem searchMenuItem = menu.findItem(R.id.search);
         SearchView searchView = (SearchView) searchMenuItem.getActionView();
 
-        searchView.setSearchableInfo(searchManager.
-                getSearchableInfo(getComponentName()));
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
         searchView.setSubmitButtonEnabled(true);
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -174,13 +183,16 @@ public class MainActivity extends AppCompatActivity {
                 mAdapter.searchRepositories(newText);
                 return true;
             }
-
-
         });
-
         return true;
     }
 
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    }
 
 }
 

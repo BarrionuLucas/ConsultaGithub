@@ -12,17 +12,19 @@
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:layout_weight="2"
-        android:weightSum="7"
+        android:weightSum="9"
         >
+
         <TextView
+            android:id="@+id/tvRepositotio"
             style="@style/TextAppearance.AppCompat.Title"
-            android:text="Repositorio"
-            android:textColor="@color/blue"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:id="@+id/tvRepositotio"
+            android:layout_weight="4"
             android:lines="2"
-            android:layout_weight="2"/>
+            android:text="Repositorio"
+            android:textColor="@color/blue"
+            android:textSize="18sp" />
 
         <TextView
             style="@style/Base.TextAppearance.AppCompat.Body1"

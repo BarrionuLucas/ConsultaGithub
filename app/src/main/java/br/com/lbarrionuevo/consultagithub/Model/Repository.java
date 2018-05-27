@@ -1,8 +1,15 @@
 package br.com.lbarrionuevo.consultagithub.Model;
 
-public class Repository {
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.PrimaryKey;
+import android.support.annotation.NonNull;
 
+@Entity
+public class Repository {
+    @NonNull
+    @PrimaryKey
     String nmRepo;
+
     String descRepo;
     String user;
     String urlImage;
@@ -24,6 +31,7 @@ public class Repository {
         this.stars = stars;
         this.forks = forks;
         this.urlImage = urlImage;
+        this.favorited = false;
     }
 
     public String getUser() {

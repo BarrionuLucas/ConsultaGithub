@@ -17,6 +17,7 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 import java.util.List;
 
+import br.com.lbarrionuevo.consultagithub.Dao.RepositoryDao;
 import br.com.lbarrionuevo.consultagithub.Model.Repository;
 import br.com.lbarrionuevo.consultagithub.Model.RepositoryJSON;
 import br.com.lbarrionuevo.consultagithub.Utils.CircleTransform;
@@ -27,15 +28,16 @@ public class RepoAdapter extends RecyclerView.Adapter<RepoAdapter.RepoViewHolder
     private Context context;
     private List<Repository> repoHistorical;
     protected List<Repository> filteredList;
-
+    RepositoryDao repositoryDao;
     Animation animation;
     private int maxPosition = -1;
-    public RepoAdapter(List<Repository> mListRepo, Context context) {
+    public RepoAdapter(List<Repository> mListRepo, Context context,  RepositoryDao repositoryDao) {
 
         this.repoHistorical = mListRepo;
         this.filteredList = new ArrayList<>();
         this.filteredList.addAll(this.repoHistorical);
         this.context = context;
+        this.repositoryDao = repositoryDao;
     }
 
 
@@ -146,8 +148,10 @@ public class RepoAdapter extends RecyclerView.Adapter<RepoAdapter.RepoViewHolder
                         ivFav.setBackgroundColor(context.getResources().getColor(R.color.red));
                         repo.setFavorited(true);
                     }
+                    repositoryDao.updateRepository(repo);
                 }
             });
+
             if(pos > maxPosition){
                 animation = AnimationUtils.loadAnimation(context, R.anim.right_to_left);
                 itemView.startAnimation(animation);
