@@ -1,5 +1,7 @@
 package br.com.lbarrionuevo.consultagithub;
 
+import android.app.SearchManager;
+import android.content.Context;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -8,6 +10,8 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
+import android.support.v7.widget.SearchView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
@@ -32,7 +36,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 import static br.com.lbarrionuevo.consultagithub.Utils.Constants.API_REPOSITORIES;
 
-public class MainActivity extends AppCompatActivity{
+public class MainActivity extends AppCompatActivity {
 
 
     private List<Repository> repoList = new ArrayList<>();
@@ -51,14 +55,14 @@ public class MainActivity extends AppCompatActivity{
 
         mRecyclerView = (RecyclerView) findViewById(R.id.rv_repo);
 
-        mAdapter = new RepoAdapter(repoList, this);
-
         layoutManager = new LinearLayoutManager(this);
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setHasFixedSize(false);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
         getData(pag);
+
+        mAdapter = new RepoAdapter(repoList, this);
         mRecyclerView.setAdapter(mAdapter);
     }
 
@@ -128,6 +132,7 @@ public class MainActivity extends AppCompatActivity{
                                 item.getForksCount(), item.getStargazersCount(), item.getOwner().getAvatarUrl() );
 
                         repoList.add(repository);
+
                         mAdapter.notifyItemRangeInserted(mAdapter.getItemCount(), repoList.size() - 1);
                     }
 
@@ -142,10 +147,40 @@ public class MainActivity extends AppCompatActivity{
 
         });
     }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+
         getMenuInflater().inflate(R.menu.main, menu);
+        SearchManager searchManager = (SearchManager)
+                getSystemService(Context.SEARCH_SERVICE);
+
+        MenuItem searchMenuItem = menu.findItem(R.id.search);
+        SearchView searchView = (SearchView) searchMenuItem.getActionView();
+
+        searchView.setSearchableInfo(searchManager.
+                getSearchableInfo(getComponentName()));
+        searchView.setSubmitButtonEnabled(true);
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                mAdapter.searchRepositories(query);
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                mAdapter.searchRepositories(newText);
+                return true;
+            }
+
+
+        });
+
         return true;
     }
+
+
 }
 

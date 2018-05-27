@@ -10,23 +10,31 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import br.com.lbarrionuevo.consultagithub.Model.Repository;
+import br.com.lbarrionuevo.consultagithub.Model.RepositoryJSON;
 import br.com.lbarrionuevo.consultagithub.Utils.CircleTransform;
+import retrofit2.Callback;
 
 public class RepoAdapter extends RecyclerView.Adapter<RepoAdapter.RepoViewHolder>  {
 
     private Context context;
-    private List<Repository> mListRepo;
+    private List<Repository> repoHistorical;
+    protected List<Repository> filteredList;
+
     Animation animation;
     private int maxPosition = -1;
     public RepoAdapter(List<Repository> mListRepo, Context context) {
 
-        this.mListRepo = mListRepo;
+        this.repoHistorical = mListRepo;
+        this.filteredList = new ArrayList<>();
+        this.filteredList.addAll(this.repoHistorical);
         this.context = context;
     }
 
@@ -46,23 +54,51 @@ public class RepoAdapter extends RecyclerView.Adapter<RepoAdapter.RepoViewHolder
     @Override
     public void onBindViewHolder(RepoViewHolder holder, int position) {
 
-        Repository repo = mListRepo.get(position);
+        Repository repo = repoHistorical.get(position);
+
+        if (filteredList.size() >0) {
+            repo = filteredList.get(position);
+        }
+
         holder.bind(repo, position, context);
+
     }
 
 
     @Override
     public int getItemCount() {
-        return mListRepo.size();
+
+        if (filteredList.size() >0) {
+            return filteredList.size();
+        }
+
+        return repoHistorical.size();
+
+    }
+
+    public void searchRepositories( String filter) {
+        filteredList.clear();
+        if (filter.isEmpty()) {
+            filteredList.addAll(repoHistorical);
+        } else {
+            for (Repository item : repoHistorical) {
+                if (item.getNmRepo().toLowerCase().contains(filter.toLowerCase())) {
+                    filteredList.add(item);
+                }
+            }
+        }
+        notifyDataSetChanged();
     }
 
     public class RepoViewHolder extends RecyclerView.ViewHolder {
         public TextView tvRepo, tvDescRepo, tvUser, tvNmUser, tvStar, tvFork;
-        public ImageView ivAvatar;
+        public ImageView ivAvatar, ivFav;
         public RepoViewHolder(View itemView) {
             super(itemView);
 
             ivAvatar = (ImageView)itemView.findViewById(R.id.ivAvatar);
+            ivFav = (ImageView)itemView.findViewById(R.id.ivFav);
+
             tvRepo = (TextView) itemView.findViewById(R.id.tvRepositotio);
             tvDescRepo = (TextView) itemView.findViewById(R.id.tvDescRepo);
             tvUser = (TextView) itemView.findViewById(R.id.tvUser);
@@ -72,7 +108,7 @@ public class RepoAdapter extends RecyclerView.Adapter<RepoAdapter.RepoViewHolder
         }
 
 
-        void bind(final Repository repo, int pos, final Context context) {
+        void bind(final Repository repo, final int pos, final Context context) {
             if(repo.getUrlImage() != " ") {
                 ivAvatar.setImageBitmap(null);
             }
@@ -98,7 +134,20 @@ public class RepoAdapter extends RecyclerView.Adapter<RepoAdapter.RepoViewHolder
                     context.startActivity(i);
                 }
             });
-
+            ivFav.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(repo.isFavorited()) {
+                        ivFav.setImageDrawable(context.getDrawable(R.drawable.ic_favorite_border_black_24dp));
+                        ivFav.setBackgroundColor(context.getResources().getColor(R.color.red));
+                        repo.setFavorited(false);
+                    }else{
+                        ivFav.setImageDrawable(context.getDrawable(R.drawable.ic_favorite_black_24dp));
+                        ivFav.setBackgroundColor(context.getResources().getColor(R.color.red));
+                        repo.setFavorited(true);
+                    }
+                }
+            });
             if(pos > maxPosition){
                 animation = AnimationUtils.loadAnimation(context, R.anim.right_to_left);
                 itemView.startAnimation(animation);

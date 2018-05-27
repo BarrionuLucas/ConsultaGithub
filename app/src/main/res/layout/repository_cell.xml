@@ -5,7 +5,7 @@
     android:layout_height="wrap_content"
     android:background="@android:color/white"
     android:orientation="horizontal"
-    android:weightSum="3">
+    android:weightSum="3.5">
 
     <LinearLayout
         android:layout_width="0dp"
@@ -21,7 +21,7 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:id="@+id/tvRepositotio"
-            android:lines="1"
+            android:lines="2"
             android:layout_weight="2"/>
 
         <TextView
@@ -105,5 +105,20 @@
 
     </LinearLayout>
 
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_weight="0.5">
+
+        <ImageButton
+            android:id="@+id/ivFav"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_vertical"
+            android:backgroundTint="@android:color/transparent"
+            android:src="@drawable/ic_favorite_border_black_24dp"
+            android:tint="@android:color/holo_red_dark" />
+    </LinearLayout>
 
 </LinearLayout>
