@@ -136,22 +136,22 @@ public class RepoAdapter extends RecyclerView.Adapter<RepoAdapter.RepoViewHolder
                     context.startActivity(i);
                 }
             });
+
+            verifyFavorite(repo);
+
             ivFav.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     if(repo.isFavorited()) {
-                        ivFav.setImageDrawable(context.getDrawable(R.drawable.ic_favorite_border_black_24dp));
-                        ivFav.setBackgroundColor(context.getResources().getColor(R.color.red));
                         repo.setFavorited(false);
                     }else{
-                        ivFav.setImageDrawable(context.getDrawable(R.drawable.ic_favorite_black_24dp));
-                        ivFav.setBackgroundColor(context.getResources().getColor(R.color.red));
                         repo.setFavorited(true);
                     }
+                    verifyFavorite(repo);
                     repositoryDao.updateRepository(repo);
                 }
             });
-
+            
             if(pos > maxPosition){
                 animation = AnimationUtils.loadAnimation(context, R.anim.right_to_left);
                 itemView.startAnimation(animation);
@@ -159,6 +159,15 @@ public class RepoAdapter extends RecyclerView.Adapter<RepoAdapter.RepoViewHolder
             }
         }
 
+        private void verifyFavorite(Repository repository) {
+            if(repository.isFavorited()) {
+                ivFav.setImageDrawable(context.getDrawable(R.drawable.ic_favorite_black_24dp));
+                ivFav.setBackgroundColor(context.getResources().getColor(R.color.red));
+            }else{
+                ivFav.setImageDrawable(context.getDrawable(R.drawable.ic_favorite_border_black_24dp));
+                ivFav.setBackgroundColor(context.getResources().getColor(R.color.red));
+            }
+        }
 
 
     }

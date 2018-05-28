@@ -72,13 +72,9 @@ public class MainActivity extends AppCompatActivity {
         mRecyclerView.setHasFixedSize(false);
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.VERTICAL));
-
+        repoList = repositoryDao.getAll();
         if(isNetworkAvailable()){
-            repositoryDao.deleteAll();
             getData(pag);
-        }else{
-            
-            //Select from Room
         }
 
 
