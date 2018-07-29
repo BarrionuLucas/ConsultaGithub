@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
     LinearLayoutManager layoutManager;
     int pag=1;
     boolean mLoading = false;
-    int lastVisibleItem;
+    int currentItem, totalItem, scrollOutItem;
     private static final String DATABASE_NAME = "OfflineDatabase";
     private OfflineDatabase offlineDatabase;
     RepositoryDao repositoryDao;
@@ -86,17 +86,20 @@ public class MainActivity extends AppCompatActivity {
     protected void onPostResume() {
         super.onPostResume();
 
-        mRecyclerView.setOnScrollListener(new RecyclerView.OnScrollListener() {
+        mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+                mLoading = true;
+            }
 
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
-
-                int totalItem = layoutManager.getItemCount();
-                lastVisibleItem = layoutManager.findLastVisibleItemPosition();
-
-                if (!mLoading && lastVisibleItem == totalItem - 1) {
-                    mLoading = true;
+                currentItem = layoutManager.getChildCount();
+                totalItem = layoutManager.getItemCount();
+                scrollOutItem = layoutManager.findFirstVisibleItemPosition();
+                if(mLoading && (currentItem+scrollOutItem == totalItem)){
                     pag++;
                     getData(pag);
                     mLoading = false;
