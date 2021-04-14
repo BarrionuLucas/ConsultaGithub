@@ -1,7 +1,7 @@
 package br.com.lbarrionuevo.consultagithub.Database;
 
-import android.arch.persistence.room.Database;
-import android.arch.persistence.room.RoomDatabase;
+import androidx.room.Database;
+import androidx.room.RoomDatabase;
 
 import br.com.lbarrionuevo.consultagithub.Dao.RepositoryDao;
 import br.com.lbarrionuevo.consultagithub.Model.Repository;
